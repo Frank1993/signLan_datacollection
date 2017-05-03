@@ -25,14 +25,14 @@ class Classifier(object):
             predicted = self.model.predict(feature)
             #print predicted
             self.isClassifying = False
-
+            print predicted
             if predicted[0] == 0:
                 return "1"
             else:
                 return "2"
         else:
             self.isClassifying = False
-            return "请放上手指"
+            return "Please put one your fingers"
 
 
 class SampleListener(Leap.Listener):
@@ -46,7 +46,7 @@ class SampleListener(Leap.Listener):
         frame = controller.frame()
 
         if not self.classifier.isClassifying:
-            print "手势：",self.classifier.predict(frame)
+            print "Sign：",self.classifier.predict(frame)
  
 
 def main():
