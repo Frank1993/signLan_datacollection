@@ -12,14 +12,14 @@ class DataPersistentListener(Leap.Listener):
         self.serialize_stream = open(serialize_file,'wb')
     """
     def on_connect(self, controller):
-        print "Connected"
+        print("Connected")
 
 
     def on_frame(self, controller):
         # get a frame
         frame = controller.frame()
         if not frame.hands.is_empty:
-              print "On Frame"
+              print("On Frame")
               self.frames.append(frame)
 
 
@@ -27,10 +27,10 @@ class DataSerialization(object):
     """docstring for DataSerialization"""
     def __init__(self, frames,serialize_stream):
 
-        print "len of frames:" + str(len(frames))
+        print("len of frames:" + str(len(frames)))
         frames = frames[10:-10]
         for i in xrange(0,len(frames),10):
-            print i
+            print( i)
             # get the raw data in the frame
             frame = frames[i]
             serialized_tuple = frame.serialize
@@ -98,7 +98,7 @@ def main():
     
 
     # Keep this process running until Enter is pressed
-    print "Press Enter to quit..."
+    print( "Press Enter to quit...")
     try:
 
         sys.stdin.readline()

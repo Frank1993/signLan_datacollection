@@ -11,51 +11,47 @@ class FeatureExtractor(object):
         numHands = len(frame.hands)
         #frame_record.append(numHands)
 
-        for hand in frame.hands:
-            handAttrs = self.getHandFeatures(hand)
-            isRight = "Right" if hand.isRight else "left"
-            handAttrs.insert(0,isRight)
+        handsAttrsDict = {}
 
-            if not hand.is_valid:
-                continue
+        for hand in frame.hands:
+            isRight = 1 if hand.isRight else 0
+
+            handAttrs = self.getHandFeatures(hand)
 
             arm = hand.arm
+            armAttrs = self.getArmFeatures(arm)
+            handAttrs.extend(armAttrs)
 
             fingers = hand.fingers
-
-            prefix = "RH" if hand.is_right else "LH" # right hand or left hand
-
-
+            fingersAttrsDict = {}
             for finger in fingers:
-                #print "finger:",finger.type
-                #print '\n'
+                if finger.is_valid:
+                    fingersAttrsDict[finger.type] = self.getFingerFeatures(finger)
 
-                is_extended = finger.is_extended
-                #print "is_extended",is_extended
-                #print "\n"
-                if is_extended:
-                    frame_record.append(1)
+            fingersAttrs = []
+            for i in range(0,5):
+                if i in fingersAttrsDict:
+                    fingersAttrs.extend(fingersAttrsDict[i])
                 else:
-                    frame_record.append(0)
+                    fingersAttrs.extend([None] *(8 + 4*7))
 
-                finger_direction = finger.direction
-                #print "finger_direction",finger_direction[0]
-                #print "\n"
-                for i in range(3):
-                    frame_record.append(finger_direction[i])
+            handAttrs.extend(fingersAttrs)
 
-                for bonetype in range(0,3):
-                    #print "bone:",bonetype
-                    #print "\n"
-                    bone = finger.bone(bonetype)
-                    bone_direction = bone.direction
-                    for i in range(3):
-                        frame_record.append(bone_direction[i])
+            handsAttrsDict[isRight] = handAttrs
 
-                    #print "bone direction", bone_direction
-        if fingerCla != None:
-            frame_record.append(fingerCla)
-        return frame_record
+        handsAttrs = []
+        if 0 in handsAttrsDict:
+            handsAttrs.extend(handsAttrsDict[0])
+        else:
+            handsAttrs.extend([None] * (12 + 5 + 5 * (8 + 4 * 7)))   # 12 for each hand, 5 for each arm, 8 for each finger, 7 for each none
+
+        if 1 in handsAttrsDict:
+            handsAttrs.extend(handsAttrsDict[1])
+        else:
+            handsAttrs.extend([None] *  (12 + 5 + 5 * (8 + 4 * 7)))
+
+
+        return handsAttrs
 
     def getHandFeatures(self,hand):
         # <is_valid, confidence, basis, directions, palm_normal, palm_position, palm_velocity, palm_width, wrist_position, grab_strength, pinch_strength,sphere_center,sphere_radius>
@@ -88,7 +84,36 @@ class FeatureExtractor(object):
               3 = TYPE_RING
               4 = TYPE_PINKY
         """
+
         if finger.is_valid:
-            return [finger.type, finger.is_extended,finger.direction,finger.length,finger.stabilized_tip_position,finger.tip_position, finger.tip_velocity,finger.touch_distance, finger.touch_zone]
+            fingerAttrs =  [finger.is_extended,finger.direction,finger.length,finger.stabilized_tip_position,finger.tip_position, finger.tip_velocity,finger.touch_distance, finger.touch_zone]
+            for i in range(4):
+                bone = finger.bone(i)
+                boneAttrs = self.getBoneFeatures(bone)
+                fingerAttrs.extend(boneAttrs)
+            return fingerAttrs
+        else:
+            return [None] * (8 + 4*7) # 8 for each finger, 7 for each bone
 
     def getBoneFeatures(self, bone):
+        """
+        all fingers contain 4 bones that make up the anatomy of the finger.
+        Bones are orderd from base to tip, indexed from 0 to 3.
+        Warning: the thumb does not have a base metacarpal bone and therefore contains a valid, zero length bone at that location
+        
+        next_joint: the position of the end of the bone cloeset to the finger tip
+        prev_joint: the position of the end of the bone cloeset to the wrist
+
+
+        """
+        if Bone.is_valid:
+            return [bone.basis, bone.center, bone.length, bone.direction, bone.width, bone.next_joint, bone.prev_joint]
+        else:
+            return [None] * 7
+
+if __name__ == "__main__":
+    from data_collection import Deserialization
+
+    de = Deserialization('frameOf1.frame')
+    frames = de.frames
+    print(frames)
