@@ -8,17 +8,18 @@ from sklearn import svm
 def getClf():
     records = []
     
-    for cla,file in [(0,"frameOf1.frame"),(1,"frameOf2.frame")]:
+    for cla,file in [(0,"frameOf1.frame"),(1,"frameOf2.frame"),(2,"frameOf3.frame"),(3,"frameOf4.frame"),(4,"frameOf5.frame"),(5,"frameOf6.frame"),(6,"frameOf7.frame"),(7,"frameOf8.frame"),(8,"frameof9.frame")]:
         de = Deserialization(file)
         frames = de.frames[100:-100]
     
         featureExtractor = FeatureExtractor()
         for frame in frames:
             frame_record = featureExtractor.getFeature(frame,cla)
+            #print len(frame_record)
             records.append(frame_record)
     
     data = np.array(records)
-    
+    print data.shape
     features = data[:,:-1]
     labels = data[:,-1]
     
