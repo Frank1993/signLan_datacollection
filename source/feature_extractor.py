@@ -1,6 +1,7 @@
 import sys
 sys.path.append("../LeapMotionSDK")
 import Leap
+
 class AttributeFilter(object):
     @classmethod
     def handRule(cls):
