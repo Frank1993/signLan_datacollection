@@ -231,7 +231,7 @@ class FeatureExtractor(object):
                 if i in fingersAttrsDict:
                     fingerFeatures.extend(fingersAttrsDict[i])
                 else:
-                    fingerFeatures.extend( [None] * (AttributeFilter.fingerFeatureNum() + 4 *AttributeFilter.boneFeatureNum()) )
+                    fingerFeatures.extend( [0.0] * (AttributeFilter.fingerFeatureNum() + 4 *AttributeFilter.boneFeatureNum()) )
 
             handFeatures.extend(fingerFeatures)
 
@@ -241,12 +241,12 @@ class FeatureExtractor(object):
         if 0 in handsAttrsDict:
             handsFeatures.extend(handsAttrsDict[0])
         else:
-            handsFeatures.extend([None] * (AttributeFilter.handFeatureNum() + AttributeFilter.armFeatureNum() + 5 * (AttributeFilter.fingerFeatureNum() + 4 *AttributeFilter.boneFeatureNum())) )   # (5 + 3*9) for each hand, (1 + 3 * 6) for each arm, 8 for each finger, 7 for each none
+            handsFeatures.extend([0.0] * (AttributeFilter.handFeatureNum() + AttributeFilter.armFeatureNum() + 5 * (AttributeFilter.fingerFeatureNum() + 4 *AttributeFilter.boneFeatureNum())) )   # (5 + 3*9) for each hand, (1 + 3 * 6) for each arm, 8 for each finger, 7 for each none
 
         if 1 in handsAttrsDict:
             handsFeatures.extend(handsAttrsDict[1])
         else:
-            handsFeatures.extend([None] *  (AttributeFilter.handFeatureNum() + AttributeFilter.armFeatureNum() + 5 * (AttributeFilter.fingerFeatureNum() + 4 *AttributeFilter.boneFeatureNum())) )
+            handsFeatures.extend([0.0] *  (AttributeFilter.handFeatureNum() + AttributeFilter.armFeatureNum() + 5 * (AttributeFilter.fingerFeatureNum() + 4 *AttributeFilter.boneFeatureNum())) )
 
 
         return handsFeatures
