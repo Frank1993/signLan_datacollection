@@ -1,6 +1,7 @@
 import sys
 sys.path.append("../LeapMotionSDK")
 import Leap
+
 class AttributeFilter(object):
     @classmethod
     def handRule(cls):
@@ -391,7 +392,7 @@ class FeatureExtractor(object):
 if __name__ == "__main__":
     from data_collection import Deserialization
 
-    de = Deserialization('frameOf1.frame')
+    de = Deserialization('../frameOf1.frame')
     frames = de.frames
     
     testFrame = frames[100]

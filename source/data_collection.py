@@ -1,8 +1,10 @@
-import Leap
 import sys
+sys.path.append("../LeapMotionSDK")
+import Leap
+
+
 import ctypes,numpy
 
-from PIL import Image
 import struct
 
 class DataPersistentListener(Leap.Listener):
