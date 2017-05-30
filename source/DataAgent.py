@@ -10,8 +10,8 @@ def getFeatureAndLabel():
     features = []
     labels = []
     featureExtactor = FeatureExtractor()
-    for motion in ["we","WeHello"]:
-        for i in range(1,51):
+    for motion in ["we","hello"]:
+        for i in range(1,501):
             leapFile = os.path.join(dynamicDataPath,"%s%s.lp"%(motion,i))
             de = Deserialization(leapFile)
             frames = de.frames
@@ -24,4 +24,6 @@ def getFeatureAndLabel():
 
     return features,labels
 if __name__ == "__main__":
-    features,lables = getFeatureAndLabel()
+    features,labels = getFeatureAndLabel()g
+    print len(features)
+    print len(labels)

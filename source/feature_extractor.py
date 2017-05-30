@@ -239,10 +239,10 @@ class FeatureExtractor(object):
             handsAttrsDict[isRight] = handFeatures
 
         handsFeatures= []
-        if 0 in handsAttrsDict:
-            handsFeatures.extend(handsAttrsDict[0])
-        else:
-            handsFeatures.extend([0.0] * (AttributeFilter.handFeatureNum() + AttributeFilter.armFeatureNum() + 5 * (AttributeFilter.fingerFeatureNum() + 4 *AttributeFilter.boneFeatureNum())) )   # (5 + 3*9) for each hand, (1 + 3 * 6) for each arm, 8 for each finger, 7 for each none
+        #if 0 in handsAttrsDict:
+            #handsFeatures.extend(handsAttrsDict[0])
+        #else:
+            #handsFeatures.extend([0.0] * (AttributeFilter.handFeatureNum() + AttributeFilter.armFeatureNum() + 5 * (AttributeFilter.fingerFeatureNum() + 4 *AttributeFilter.boneFeatureNum())) )   # (5 + 3*9) for each hand, (1 + 3 * 6) for each arm, 8 for each finger, 7 for each none
 
         if 1 in handsAttrsDict:
             handsFeatures.extend(handsAttrsDict[1])

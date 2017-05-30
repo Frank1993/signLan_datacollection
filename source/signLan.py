@@ -8,15 +8,15 @@ import numpy as np
 from DataAgent import getFeatureAndLabel
 
 
-HIDDEN_SIZE = 20
+HIDDEN_SIZE = 100
 KEEP_PROB = 0.5
 BATCH_SIZE = 100
 TIMESTEPS = 5
 CLASS_NUM = 2
 
-MAX_STEPS = 500
+MAX_STEPS = 5000
 
-DIMS = 622
+DIMS = 311
 
 def inference(features):
 	"""
@@ -80,20 +80,26 @@ def train():
 			init = tf.global_variables_initializer()
 			sess.run(init)
 			features,labels = getFeatureAndLabel()
+			test_losses = []
 			for step in range(MAX_STEPS):
 				i = np.random.randint(0,len(features))
-				print("***"*4 + "batch:" +"***"*4)
-				print(i)
+				#print("***"*4 + "batch:" +"***"*4)
+				#print(i)
 				feature = np.array(features[i])
 				feature = feature[np.newaxis,:]
 
 				label = np.array([labels[i]])
 				#label = label[np.newaxis,:]
-				print(label)
-				hstate,lgts,loss,_ = sess.run([h_state,logits,train_loss,train_op],feed_dict = {X:feature,y:label})
-				print(hstate)
-				print (lgts)
-				print(loss)
+				#print(label)
+				loss,_ = sess.run([train_loss,train_op],feed_dict = {X:feature,y:label})
+				#print(hstate)
+				#print (lgts)
+				#print(loss)
+				test_losses.append(loss)
+
+			with open("/Users/hu/tmp/losses.txt",'w') as f:
+				for l in test_losses:
+					f.write("%s,\n"%l)
 
 def Main():
 	train()
