@@ -9,14 +9,13 @@ from DataAgent import getFeatureAndLabel
 
 
 HIDDEN_SIZE = 100
-KEEP_PROB = 0.5
+KEEP_PROB = 0.7
 BATCH_SIZE = 100
-TIMESTEPS = 5
 CLASS_NUM = 2
 
 MAX_STEPS = 5000
 
-DIMS = 311
+DIMS = 26
 
 def inference(features):
 	"""
@@ -73,33 +72,59 @@ def train():
 		logits=tf.matmul(h_state,weight)+bias
 		
 		train_loss = GetLoss(logits,y)
-		train_op = optimize(train_loss)
+		mean_loss = tf.reduce_mean(train_loss)
 
-		#saver = tf.train.Saver()
+		correct_prediction = tf.argmax(logits, 1)
+        #accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+
+		#tf.summary.scalar("losses",mean_loss)
+		#tf.summary.scalar("accuracy",accuracy)
+
+		train_op = optimize(train_loss)
+		#summary_merged = tf.summary.merge_all()
+		accs = []
+		saver = tf.train.Saver()
 		with tf.Session() as sess:
 			init = tf.global_variables_initializer()
 			sess.run(init)
-			features,labels = getFeatureAndLabel()
-			test_losses = []
-			for step in range(MAX_STEPS):
-				i = np.random.randint(0,len(features))
+			features_train,labels_train,features_test,labels_test = getFeatureAndLabel()
+			#train_writer = tf.summary.FileWriter("./GraphAndSummary",sess.graph)
+			for step in range(100000):
+				i = np.random.randint(0,len(features_train))
 				#print("***"*4 + "batch:" +"***"*4)
 				#print(i)
-				feature = np.array(features[i])
-				feature = feature[np.newaxis,:]
+				input_train = np.array(features_train[i])
+				input_train = input_train[np.newaxis,:]
 
-				label = np.array([labels[i]])
+				label_train = np.array([labels_train[i]])
 				#label = label[np.newaxis,:]
 				#print(label)
-				loss,_ = sess.run([train_loss,train_op],feed_dict = {X:feature,y:label})
+				_ = sess.run([train_op],feed_dict = {X:input_train,y:label_train})
+				#train_writer.add_summary(summary,step)
 				#print(hstate)
 				#print (lgts)
 				#print(loss)
-				test_losses.append(loss)
 
-			with open("/Users/hu/tmp/losses.txt",'w') as f:
-				for l in test_losses:
-					f.write("%s,\n"%l)
+				if step % 1000 == 0:
+					num_correct_predict = 0
+					for j in range(len(features_test)):
+						input_test = np.array(features_test[j])
+						input_test = input_test[np.newaxis,:]
+						label_test = np.array([labels_test[j]])
+
+						predict_class = sess.run([correct_prediction],feed_dict = {X:input_test,y:label_test})
+						if predict_class == label_test[0]:
+							num_correct_predict += 1
+
+					acc =  float(num_correct_predict)/len(features_test)
+					print(acc)
+					accs.append(acc)
+					saver.save(sess,"./checks/SignClassifier",global_step = step)
+		with open("./accracy") as f:
+			for item in accs:
+				f.write("%s\n"%item)
+
+		#train_writer.close()
 
 def Main():
 	train()

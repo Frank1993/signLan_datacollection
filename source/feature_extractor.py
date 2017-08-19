@@ -1,5 +1,13 @@
+import os
+
+filepath = os.path.realpath(__file__)
+projectDir = os.path.dirname(os.path.dirname(filepath))
+
+leapMotionSDKPath = os.path.join(projectDir, "LeapMotionSDK")
+
 import sys
-sys.path.append("../LeapMotionSDK")
+sys.path.append(leapMotionSDKPath)
+
 import Leap
 
 class AttributeFilter(object):
@@ -22,20 +30,20 @@ class AttributeFilter(object):
         hand.sphere_center: vector
         hand.sphere_radius: float
         """
-        return [("hand_confidence","float",False),
-                ("hand_basis_xbasis","vector",True),
-                ("hand_basis_ybasis","vector",True),
-                ("hand_basis_zbasis","vector",True),
-                ("hand_direction","vector",True),
-                ("hand_palm_normal","vector",True),
-                ("hand_palm_position","vector",False),
-                ("hand_palm_velocity","vector",True),
-                ("hand_width","float",False),
-                ("hand_wrisit_position","vector",False),
-                ("hand_grab_strength","float",False),
-                ("hand_pinch_strength","float",False),
-                ("hand_sphere_center","vector",False),
-                ("hand_sphere_radius","float",True)]
+        return [("hand_confidence","float",False,False),
+                ("hand_basis_xbasis","vector",False,True),
+                ("hand_basis_ybasis","vector",False,True),
+                ("hand_basis_zbasis","vector",False,True),
+                ("hand_direction","vector",True,True),
+                ("hand_palm_normal","vector",True,True),
+                ("hand_palm_position","vector",False,True),
+                ("hand_palm_velocity", "vector", False, True),
+                ("hand_width","float",False,True), 
+                ("hand_wrisit_position","vector",False,True),
+                ("hand_grab_strength","float",False,True),
+                ("hand_pinch_strength","float",False,True),
+                ("hand_sphere_center","vector",False,True),
+                ("hand_sphere_radius","float",False,True)]
 
     @classmethod
     def armRule(cls):
@@ -48,13 +56,13 @@ class AttributeFilter(object):
         arm.width: float
         arm.wrist_position: vector 
         """
-        return [("arm_basis_xbasis","vector",True),
-                ("arm_basis_ybasis","vector",True),
-                ("arm_basis_zbasis","vector",True),
-                ("arm_direction","vector",True),
-                ("arm_elbow_position","vector",False),
-                ("arm_width","float",False),
-                ("arm_wrist_position","vector",False)]
+        return [("arm_basis_xbasis","vector",False,True),
+                ("arm_basis_ybasis","vector",False,True),
+                ("arm_basis_zbasis","vector",False,True),
+                ("arm_direction","vector",False,True),
+                ("arm_elbow_position","vector",False,True),
+                ("arm_width","float",False,True),
+                ("arm_wrist_position","vector",False,True)]
     @classmethod
     def fingerRule(cls):
         """
@@ -67,14 +75,14 @@ class AttributeFilter(object):
         finger.touch_distance: float
         finger.touch_zone: integer
         """
-        return [("finger_is_extended","float",True),
-                ("finger_direction","vector",True),
-                ("finger_length","float",False),
-                ("finger_stabilized_tip_position","vector",False),
-                ("finger_tip_position","vector",False),
-                ("finger_tip_velocity","vector",True),
-                ("finger_touch_distance","float",True),
-                ("finger_touch_zone","float",False)]
+        return [("finger_is_extended","float",True,False),
+                ("finger_direction","vector",True,True),
+                ("finger_length","float",False,True),
+                ("finger_stabilized_tip_position","vector",False,True),
+                ("finger_tip_position","vector",False,True),
+                ("finger_tip_velocity","vector",False,True),
+                ("finger_touch_distance","float",False,True),
+                ("finger_touch_zone","float",False,False)]
 
     @classmethod
     def boneRule(cls):
@@ -89,15 +97,15 @@ class AttributeFilter(object):
         bone.next_joint: vector
         bone.prev_joint vector 
         """
-        return [("bone_basis_xbasis","vector",True),
-                ("bone_basis_ybasis","vector",True),
-                ("bone_basis_zbasis","vector",True),
-                ("bone_center","vector",False),
-                ("bone_length","float",False),
-                ("bone_direction","vector",True),
-                ("bone_width","float",False),
-                ("bone_next_joint","vector",False),
-                ("bone_prev_joint","vector",False)]
+        return [("bone_basis_xbasis","vector",False,True),
+                ("bone_basis_ybasis","vector",False,True),
+                ("bone_basis_zbasis","vector",False,True),
+                ("bone_center","vector",False,True),
+                ("bone_length","float",False,True),
+                ("bone_direction","vector",False,True),
+                ("bone_width","float",False,True),
+                ("bone_next_joint","vector",False,True),
+                ("bone_prev_joint","vector",False,True)]
 
     @classmethod
     def filter(cls, attrs,rule):
@@ -180,7 +188,7 @@ class AttributeFilter(object):
     @classmethod
     def frameFeatureName(cls):
         frameFeatureNames = []
-        for handType in ["left_","right_"]:
+        for handType in ["right_"]:
             handFeatureName = []
             handFeatureName.extend(cls.featureName(cls.handRule(),handType))
             handFeatureName.extend(cls.featureName(cls.armRule(),handType))
@@ -194,6 +202,32 @@ class AttributeFilter(object):
             frameFeatureNames.extend(handFeatureName)
 
         return frameFeatureNames
+
+    @classmethod
+    def getDuplicateIndexes(cls):
+        indicator = []
+        for handType in ["right_"]:
+            indicator.extend(cls.getOscilateIndexes(cls.handRule()))
+            indicator.extend(cls.getOscilateIndexes(cls.armRule()))
+            for i in range(5):
+                fingerInd = cls.getOscilateIndexes(cls.fingerRule())
+                for i in range(4):
+                    fingerInd.extend(cls.getOscilateIndexes(cls.boneRule()))
+                indicator.extend(fingerInd)
+        return indicator
+    @classmethod
+    def getOscilateIndexes(cls,rules):
+        indicator = []
+        for rule in rules:
+            if rule[2]:
+                if rule[1] == "float":
+                    indicator.extend([rule[3]])
+                else:
+                    for i in range(3):
+                        indicator.extend([rule[3]])
+        return indicator
+
+
 
 
 
@@ -392,17 +426,22 @@ class FeatureExtractor(object):
 if __name__ == "__main__":
     from data_collection import Deserialization
 
-    de = Deserialization('../frameOf1.frame')
+    de = Deserialization(os.path.join(projectDir,"frameOf1.frame"))
     frames = de.frames
     
     testFrame = frames[100]
     featureExtactor = FeatureExtractor()
 
     features = featureExtactor.getFeature(testFrame)
-    print(features)
+    #print(features)
     print(len(features))
 
     featureName= AttributeFilter.frameFeatureName()
-    print(featureName)
+    #print(featureName)
     print(len(featureName))
+
+    duplicateIndexes =  AttributeFilter.getDuplicateIndexes()
+    #print duplicateIndexes
+    print len(duplicateIndexes)
+    print len(duplicateIndexes) - sum(duplicateIndexes)
     
