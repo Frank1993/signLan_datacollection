@@ -25,9 +25,11 @@ def getFeatureAndLabel():
     duplicateIndexes =  AttributeFilter.getDuplicateIndexes()
     sampleDuplicator = SampleDuplicator(duplicateIndexes)
 
-    for motion in ["we","hello"]:
+    for motion,label in [("we",0),("hello",1),("you",2),("teacher",3),("no",4),("eat",5)]:
         for i in range(1,501):
             leapFile = os.path.join(dynamicDataPath,"%s%s.lp"%(motion,i))
+            if not os.path.exists(leapFile):
+                continue
             de = Deserialization(leapFile)
             frames = de.frames
             featureOfFrames = []
@@ -37,7 +39,7 @@ def getFeatureAndLabel():
                 oscilatedSamples = sampleDuplicator.duplicate(featureOfFrames)
 
                 features.extend(oscilatedSamples)
-                labels.extend([0 if motion == "we" else 1] * (len(featureOfFrames * sum(1 if CanDuplicate else 0 for CanDuplicate in duplicateIndexes))))
+                labels.extend([label] * (len(featureOfFrames * sum(1 if CanDuplicate else 0 for CanDuplicate in duplicateIndexes))))
 
     indexes = [i for i in range(len(features))]
 

@@ -34,8 +34,8 @@ def inference(features):
 	h_state = outputs[:, -1, :] #[batch_size, hidden_size]
 
 
-	weight = tf.get_variable("weight",[HIDDEN_SIZE,2],initializer=tf.truncated_normal_initializer(),dtype=tf.float32)
-	bias = tf.get_variable("bias",[2],initializer=tf.constant_initializer())
+	weight = tf.get_variable("weight",[HIDDEN_SIZE,6],initializer=tf.truncated_normal_initializer(),dtype=tf.float32)
+	bias = tf.get_variable("bias",[6],initializer=tf.constant_initializer())
 
 	logits=tf.matmul(h_state,weight)+bias
 
@@ -66,8 +66,8 @@ def train():
 		h_state = outputs[:, -1, :] #[batch_size, hidden_size]
 
 
-		weight = tf.get_variable("weight",[HIDDEN_SIZE,2],initializer=tf.truncated_normal_initializer(),dtype=tf.float32)
-		bias = tf.get_variable("bias",[2],initializer=tf.constant_initializer())
+		weight = tf.get_variable("weight",[HIDDEN_SIZE,6],initializer=tf.truncated_normal_initializer(),dtype=tf.float32)
+		bias = tf.get_variable("bias",[6],initializer=tf.constant_initializer())
 
 		logits=tf.matmul(h_state,weight)+bias
 		
@@ -89,8 +89,9 @@ def train():
 			sess.run(init)
 			features_train,labels_train,features_test,labels_test = getFeatureAndLabel()
 			#train_writer = tf.summary.FileWriter("./GraphAndSummary",sess.graph)
-			for step in range(100000):
-				i = np.random.randint(0,len(features_train))
+			for step in range(343677):
+				#i = np.random.randint(0,len(features_train))
+				i = step
 				#print("***"*4 + "batch:" +"***"*4)
 				#print(i)
 				input_train = np.array(features_train[i])
@@ -119,7 +120,7 @@ def train():
 					acc =  float(num_correct_predict)/len(features_test)
 					print(acc)
 					accs.append(acc)
-					saver.save(sess,"./checks/SignClassifier",global_step = step)
+					saver.save(sess,"./model2/SignClassifier",global_step = step)
 		with open("./accracy") as f:
 			for item in accs:
 				f.write("%s\n"%item)

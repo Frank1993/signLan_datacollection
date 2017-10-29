@@ -1,0 +1,6 @@
+model_checkpoint_path: "SignClassifier-28000"
+all_model_checkpoint_paths: "SignClassifier-24000"
+all_model_checkpoint_paths: "SignClassifier-25000"
+all_model_checkpoint_paths: "SignClassifier-26000"
+all_model_checkpoint_paths: "SignClassifier-27000"
+all_model_checkpoint_paths: "SignClassifier-28000"

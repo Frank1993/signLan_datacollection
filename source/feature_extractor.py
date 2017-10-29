@@ -283,7 +283,8 @@ class FeatureExtractor(object):
         else:
             handsFeatures.extend([0.0] *  (AttributeFilter.handFeatureNum() + AttributeFilter.armFeatureNum() + 5 * (AttributeFilter.fingerFeatureNum() + 4 *AttributeFilter.boneFeatureNum())) )
 
-
+        if fingerCla != None:
+            handsFeatures.append(fingerCla)
         return handsFeatures
 
     def attrsToFeatures(self,attrs):

@@ -14,7 +14,7 @@ features = convertFramesToFeatures(frames)
 """
 sess = tf.Session()
 
-checkpoint_state = tf.train.get_checkpoint_state("./checks")
+checkpoint_state = tf.train.get_checkpoint_state("./model2")
 checkpoint_path = checkpoint_state.model_checkpoint_path
 saver = tf.train.import_meta_graph(checkpoint_path+".meta")
 saver.restore(sess,checkpoint_path)
