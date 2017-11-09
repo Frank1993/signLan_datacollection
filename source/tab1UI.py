@@ -118,12 +118,11 @@ class Tab1UI(QWidget):
         self.baiduTTS.playVoice(label,audioFile)
 
     def setNewImage(self, image):
-        """
+        
         qPixMap = QPixmap.fromImage(image)
         self.imageLable.setPixmap(qPixMap)
         #QApplication.processEvents()
-        """
-        pass
+        
     def displayImage(self,i):
 
         qPixMap = QPixmap("/Users/frank/Desktop/images/%s.png"%(i + 1))
